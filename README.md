@@ -68,6 +68,24 @@ bun run build:windows-x64
 
 Output binaries are generated in `dist/`.
 
+## Install Binary from Release
+
+Use helper script:
+
+```bash
+# user install (recommended, no root)
+./install.sh --user
+
+# system install (/usr/local/bin, needs sudo/root)
+./install.sh --system
+
+# specific version
+./install.sh --version v0.2.0 --user
+```
+
+Quick answer: **root is not required** if you install to user path (`~/.local/bin`).
+Use root/sudo only for system-wide install to `/usr/local/bin`.
+
 ## Payload Format
 
 The agent sends JSON payload per plugin:
