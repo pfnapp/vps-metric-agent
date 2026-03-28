@@ -16,18 +16,21 @@ Lightweight VPS metric agent built with Bun and plugin architecture.
 
 ### Install from Release Binary
 
-Use helper script:
+Simple one-liner via `curl` (direct from this repo raw):
 
 ```bash
 # user install (recommended, no root)
-./install.sh --user
+curl -fsSL https://raw.githubusercontent.com/pfnapp/vps-metric-agent/main/install.sh | bash -s -- --user
 
 # system install (/usr/local/bin, needs sudo/root)
-./install.sh --system
+curl -fsSL https://raw.githubusercontent.com/pfnapp/vps-metric-agent/main/install.sh | bash -s -- --system
 
 # install specific version
-./install.sh --version v0.2.0 --user
+curl -fsSL https://raw.githubusercontent.com/pfnapp/vps-metric-agent/main/install.sh | bash -s -- --version v0.2.0 --user
 ```
+
+Raw script URL:
+`https://raw.githubusercontent.com/pfnapp/vps-metric-agent/main/install.sh`
 
 **Root required?**
 - **No** for user install (`~/.local/bin`) ✅
