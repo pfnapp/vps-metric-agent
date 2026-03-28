@@ -1,3 +1,4 @@
+import { getRuntime } from "../runtime";
 import { MetricPlugin } from "../types";
 
 export function parseMeminfo(meminfo: string) {
@@ -27,11 +28,12 @@ export const memoryPlugin: MetricPlugin = {
   name: "memory",
   intervalSec: 15,
   collect: async () => {
-    const meminfo = await Bun.file("/proc/meminfo").text();
+    const { readFileText, now } = getRuntime();
+    const meminfo = await readFileText("/proc/meminfo");
 
     return {
       ...parseMeminfo(meminfo),
-      ts: Date.now(),
+      ts: now(),
     };
   },
 };

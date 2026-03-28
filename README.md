@@ -94,7 +94,13 @@ This repository includes CI workflow to build binaries for:
 
 Artifacts are uploaded from each workflow run.
 
+## Release & Quality Gates
+
+- Versioning/changelog managed via **Release Please** (`release-please.yml`)
+- Branch protection on `main` requires passing `test` check before merge
+
 ## Notes
 
 - Ingest API implementation intentionally deferred for next phase.
 - Plugin layout now split by concern for readability and easier extension.
+- Golden `/proc` fixtures are stored in `test/fixtures/proc/`.

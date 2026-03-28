@@ -1,3 +1,4 @@
+import { getRuntime } from "../runtime";
 import { MetricPlugin } from "../types";
 
 export function parseUptimeSeconds(raw: string) {
@@ -9,11 +10,12 @@ export const uptimePlugin: MetricPlugin = {
   name: "uptime",
   intervalSec: 30,
   collect: async () => {
-    const raw = await Bun.file("/proc/uptime").text();
+    const { readFileText, now } = getRuntime();
+    const raw = await readFileText("/proc/uptime");
 
     return {
       uptime_sec: parseUptimeSeconds(raw),
-      ts: Date.now(),
+      ts: now(),
     };
   },
 };

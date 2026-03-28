@@ -1,3 +1,4 @@
+import { getRuntime } from "../runtime";
 import { MetricPlugin } from "../types";
 
 export function parseCpuTotalIdle(stat: string): { total: number; idle: number } | null {
@@ -18,7 +19,8 @@ export const cpuPlugin: MetricPlugin = {
   name: "cpu",
   intervalSec: 15,
   collect: async () => {
-    const stat = await Bun.file("/proc/stat").text();
+    const { readFileText, now } = getRuntime();
+    const stat = await readFileText("/proc/stat");
     const current = parseCpuTotalIdle(stat);
 
     let cpuUsedPct = 0;
@@ -29,12 +31,12 @@ export const cpuPlugin: MetricPlugin = {
     }
 
     if (current) {
-      previous = { ...current, ts: Date.now() };
+      previous = { ...current, ts: now() };
     }
 
     return {
       cpu_used_pct: Number(cpuUsedPct.toFixed(2)),
-      ts: Date.now(),
+      ts: now(),
     };
   },
 };

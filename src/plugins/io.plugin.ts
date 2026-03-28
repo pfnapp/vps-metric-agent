@@ -1,3 +1,4 @@
+import { getRuntime } from "../runtime";
 import { MetricPlugin } from "../types";
 
 type Totals = { rxBytes: number; txBytes: number; at: number };
@@ -31,8 +32,9 @@ export const ioPlugin: MetricPlugin = {
   name: "io",
   intervalSec: 15,
   collect: async () => {
-    const now = Date.now();
-    const netDev = await Bun.file("/proc/net/dev").text();
+    const { readFileText, now: nowFn } = getRuntime();
+    const now = nowFn();
+    const netDev = await readFileText("/proc/net/dev");
     const current = parseNetDev(netDev);
 
     let rxBytesPerSec = 0;

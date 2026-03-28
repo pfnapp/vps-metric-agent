@@ -1,3 +1,4 @@
+import { getRuntime } from "../runtime";
 import { MetricPlugin } from "../types";
 
 export function parseLoadavg(raw: string) {
@@ -13,11 +14,12 @@ export const loadPlugin: MetricPlugin = {
   name: "load",
   intervalSec: 15,
   collect: async () => {
-    const raw = await Bun.file("/proc/loadavg").text();
+    const { readFileText, now } = getRuntime();
+    const raw = await readFileText("/proc/loadavg");
 
     return {
       ...parseLoadavg(raw),
-      ts: Date.now(),
+      ts: now(),
     };
   },
 };

@@ -1,3 +1,4 @@
+import { getRuntime } from "../runtime";
 import { MetricPlugin } from "../types";
 
 export function parseDfRootLine(line: string) {
@@ -20,12 +21,12 @@ export const storagePlugin: MetricPlugin = {
   name: "storage",
   intervalSec: 60,
   collect: async () => {
-    const proc = Bun.spawn(["bash", "-lc", "df -Pk / | tail -1"]);
-    const out = await new Response(proc.stdout).text();
+    const { runCommandText, now } = getRuntime();
+    const out = await runCommandText("df -Pk / | tail -1");
 
     return {
       ...parseDfRootLine(out),
-      ts: Date.now(),
+      ts: now(),
     };
   },
 };
