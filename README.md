@@ -97,6 +97,8 @@ Artifacts are uploaded from each workflow run.
 ## Release & Quality Gates
 
 - Versioning/changelog managed via **Release Please** (`release-please.yml`)
+  - Requires repository secret `RELEASE_PLEASE_TOKEN` (classic PAT with `repo` scope)
+  - If secret is absent, workflow auto-skip with info message (non-failing)
 - Branch protection on `main` requires passing `test` check before merge
 
 ## Notes
