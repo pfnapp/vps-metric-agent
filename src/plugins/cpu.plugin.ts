@@ -1,6 +1,6 @@
 import { MetricPlugin } from "../types";
 
-function parseCpuTotalIdle(stat: string): { total: number; idle: number } | null {
+export function parseCpuTotalIdle(stat: string): { total: number; idle: number } | null {
   const line = stat.split("\n").find((l) => l.startsWith("cpu "));
   if (!line) return null;
 

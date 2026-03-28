@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "bun run src/index.ts",
+    "test": "bun test",
+    "test:ci": "bun test --bail",
     "build:linux-x64": "mkdir -p dist && bun build --compile --target=bun-linux-x64-modern --outfile dist/vps-metric-agent-linux-x64 src/index.ts",
     "build:linux-arm64": "mkdir -p dist && bun build --compile --target=bun-linux-arm64 --outfile dist/vps-metric-agent-linux-arm64 src/index.ts",
     "build:darwin-arm64": "mkdir -p dist && bun build --compile --target=bun-darwin-arm64 --outfile dist/vps-metric-agent-darwin-arm64 src/index.ts",

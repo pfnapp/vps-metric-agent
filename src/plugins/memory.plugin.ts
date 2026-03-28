@@ -1,6 +1,6 @@
 import { MetricPlugin } from "../types";
 
-function parseMeminfo(meminfo: string) {
+export function parseMeminfo(meminfo: string) {
   const map = new Map<string, number>();
 
   for (const line of meminfo.split("\n")) {

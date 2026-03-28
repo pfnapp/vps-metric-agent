@@ -2,7 +2,7 @@ import { MetricPlugin } from "../types";
 
 type Totals = { rxBytes: number; txBytes: number; at: number };
 
-function parseNetDev(content: string): { rxBytes: number; txBytes: number } {
+export function parseNetDev(content: string): { rxBytes: number; txBytes: number } {
   let rxBytes = 0;
   let txBytes = 0;
 

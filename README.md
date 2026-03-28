@@ -35,6 +35,21 @@ Lightweight VPS metric agent built with Bun and plugin architecture.
 bun run src/index.ts
 ```
 
+## Test
+
+```bash
+# run all tests
+bun test
+
+# CI-style (stop at first failure)
+bun run test:ci
+```
+
+Test focus:
+- parser correctness for each plugin
+- malformed input fallback (no crash, sane defaults)
+- plugin registry sanity (name + interval)
+
 ## Build Binary
 
 ```bash
