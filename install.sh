@@ -6,6 +6,7 @@ BINARY_NAME="vps-metric-agent"
 MODE="user" # user|system
 VERSION="latest"
 INSTALL_DIR=""
+FORCE="0"
 
 usage() {
   cat <<'EOF'
@@ -19,6 +20,7 @@ Options:
   --system             Install to /usr/local/bin (requires root or sudo)
   --version <tag>      Install specific tag (e.g. v0.2.0). Default: latest
   --dir <path>         Custom install directory
+  --force              Overwrite existing binary if present
   -h, --help           Show this help
 
 Examples:
@@ -26,6 +28,7 @@ Examples:
   ./install.sh --system
   ./install.sh --version v0.2.0 --user
   ./install.sh --dir /opt/bin
+  ./install.sh --force
 EOF
 }
 
@@ -64,6 +67,10 @@ parse_args() {
         INSTALL_DIR="${2:-}"
         [[ -n "$INSTALL_DIR" ]] || { err "--dir requires value"; exit 1; }
         shift 2
+        ;;
+      --force)
+        FORCE="1"
+        shift
         ;;
       -h|--help)
         usage
@@ -138,6 +145,16 @@ download_and_install() {
   asset_name="$(detect_asset_name)"
   target_dir="$(resolve_install_dir)"
   final_path="${target_dir}/${BINARY_NAME}"
+
+  if [[ -e "$final_path" && "$FORCE" != "1" ]]; then
+    err "Existing binary found: ${final_path}"
+    err "Use --force to overwrite, or remove existing binary first."
+    exit 1
+  fi
+
+  if [[ -e "$final_path" && "$FORCE" == "1" ]]; then
+    log "Existing binary will be overwritten (--force): ${final_path}"
+  fi
 
   log "Detected asset: ${asset_name}"
   log "Resolving release URL (${VERSION})..."

@@ -27,7 +27,13 @@ curl -fsSL https://raw.githubusercontent.com/pfnapp/vps-metric-agent/main/instal
 
 # install specific version
 curl -fsSL https://raw.githubusercontent.com/pfnapp/vps-metric-agent/main/install.sh | bash -s -- --version v0.2.0 --user
+
+# overwrite existing binary
+curl -fsSL https://raw.githubusercontent.com/pfnapp/vps-metric-agent/main/install.sh | bash -s -- --user --force
 ```
+
+Default behavior is safe: if binary already exists, installer stops with error.
+Use `--force` only when you intentionally want to replace it.
 
 Raw script URL:
 `https://raw.githubusercontent.com/pfnapp/vps-metric-agent/main/install.sh`
