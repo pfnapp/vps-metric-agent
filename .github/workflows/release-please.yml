@@ -11,20 +11,20 @@ permissions:
 
 jobs:
   release-please:
-    if: ${{ secrets.RELEASE_PLEASE_TOKEN != '' }}
     runs-on: ubuntu-latest
+    env:
+      RELEASE_PLEASE_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
     steps:
-      - uses: googleapis/release-please-action@v4
+      - name: Run release-please
+        if: ${{ env.RELEASE_PLEASE_TOKEN != '' }}
+        uses: googleapis/release-please-action@v4
         with:
-          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          token: ${{ env.RELEASE_PLEASE_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
-  release-please-disabled:
-    if: ${{ secrets.RELEASE_PLEASE_TOKEN == '' }}
-    runs-on: ubuntu-latest
-    steps:
       - name: Skip release-please (token not configured)
+        if: ${{ env.RELEASE_PLEASE_TOKEN == '' }}
         run: |
           echo "RELEASE_PLEASE_TOKEN is not configured."
           echo "Org policy blocks write permissions for GITHUB_TOKEN, so Release Please is skipped by design."
