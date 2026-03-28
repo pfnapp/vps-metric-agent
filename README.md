@@ -5,10 +5,20 @@ Lightweight VPS metric agent built with Bun and plugin architecture.
 ## Features
 
 - Plugin-based metric collection (`src/plugins/*`)
-- Very small runtime footprint
+- 1 plugin = 1 metric domain (easy to read/maintain)
 - Push-based delivery to custom ingest API (to be implemented later)
 - Supports `dry-run` mode for local validation
-- Can be compiled into a standalone binary with Bun
+- Can be compiled into standalone binary with Bun
+
+## Current Plugins
+
+- `cpu.plugin.ts` → `cpu_used_pct`
+- `memory.plugin.ts` → `mem_total_kb`, `mem_available_kb`, `mem_used_kb`, `mem_used_pct`
+- `load.plugin.ts` → `load1`, `load5`, `load15`
+- `io.plugin.ts` → `net_rx_bytes_total`, `net_tx_bytes_total`, `net_rx_bytes_per_sec`, `net_tx_bytes_per_sec`
+- `storage.plugin.ts` → root storage usage (`storage_root_*`)
+- `uptime.plugin.ts` → `uptime_sec`
+- `process.plugin.ts` → `process_count`
 
 ## Environment Variables
 
@@ -45,16 +55,14 @@ Output binaries are generated in `dist/`.
 
 ## Payload Format
 
-The agent sends this JSON payload to ingest API:
+The agent sends JSON payload per plugin:
 
 ```json
 {
   "host_id": "vps-01",
-  "plugin": "system",
+  "plugin": "cpu",
   "metrics": {
     "cpu_used_pct": 27.3,
-    "mem_used_pct": 61.2,
-    "load1": 0.45,
     "ts": 1760000000000
   }
 }
@@ -74,4 +82,4 @@ Artifacts are uploaded from each workflow run.
 ## Notes
 
 - Ingest API implementation intentionally deferred for next phase.
-- Current plugins: `system`, `disk`.
+- Plugin layout now split by concern for readability and easier extension.
