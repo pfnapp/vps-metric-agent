@@ -2,73 +2,19 @@
 
 Lightweight VPS metric agent built with Bun and plugin architecture.
 
-## Features
+## ✨ Highlights
 
-- Plugin-based metric collection (`src/plugins/*`)
-- 1 plugin = 1 metric domain (easy to read/maintain)
-- Push-based delivery to custom ingest API (to be implemented later)
-- Supports `dry-run` mode for local validation
-- Can be compiled into standalone binary with Bun
+- ⚡ Lightweight binary agent (Bun-compiled)
+- 🧩 Plugin-based metrics (1 plugin = 1 concern)
+- 📤 Push model to your ingest API endpoint
+- 🧪 Strong test baseline (unit + integration + golden fixtures)
+- 🏗️ CI builds multi-platform binaries (Linux/macOS/Windows)
 
-## Current Plugins
+---
 
-- `cpu.plugin.ts` → `cpu_used_pct`
-- `memory.plugin.ts` → `mem_total_kb`, `mem_available_kb`, `mem_used_kb`, `mem_used_pct`
-- `load.plugin.ts` → `load1`, `load5`, `load15`
-- `io.plugin.ts` → `net_rx_bytes_total`, `net_tx_bytes_total`, `net_rx_bytes_per_sec`, `net_tx_bytes_per_sec`
-- `storage.plugin.ts` → root storage usage (`storage_root_*`)
-- `uptime.plugin.ts` → `uptime_sec`
-- `process.plugin.ts` → `process_count`
+## 1) Install & Use (for users)
 
-## Environment Variables
-
-| Variable | Required | Description |
-|---|---|---|
-| `HOST_ID` | no | Host identifier sent in payload (fallback: `HOSTNAME`) |
-| `INGEST_URL` | no | HTTP endpoint for metric ingest. If empty => dry-run |
-| `AGENT_TOKEN` | no | Bearer token for ingest API |
-| `DRY_RUN` | no | Force dry-run mode (`1` to enable) |
-
-## Local Run
-
-```bash
-bun run src/index.ts
-```
-
-## Test
-
-```bash
-# run all tests
-bun test
-
-# CI-style (stop at first failure)
-bun run test:ci
-```
-
-Test focus:
-- parser correctness for each plugin
-- malformed input fallback (no crash, sane defaults)
-- plugin registry sanity (name + interval)
-
-## Build Binary
-
-```bash
-# Linux x64
-bun run build:linux-x64
-
-# Linux arm64
-bun run build:linux-arm64
-
-# macOS arm64
-bun run build:darwin-arm64
-
-# Windows x64
-bun run build:windows-x64
-```
-
-Output binaries are generated in `dist/`.
-
-## Install Binary from Release
+### Install from Release Binary
 
 Use helper script:
 
@@ -79,16 +25,54 @@ Use helper script:
 # system install (/usr/local/bin, needs sudo/root)
 ./install.sh --system
 
-# specific version
+# install specific version
 ./install.sh --version v0.2.0 --user
 ```
 
-Quick answer: **root is not required** if you install to user path (`~/.local/bin`).
-Use root/sudo only for system-wide install to `/usr/local/bin`.
+**Root required?**
+- **No** for user install (`~/.local/bin`) ✅
+- **Yes** only for system-wide install to `/usr/local/bin` (`--system`) ✅
 
-## Payload Format
+---
 
-The agent sends JSON payload per plugin:
+### Configure
+
+Environment variables:
+
+| Variable | Required | Description |
+|---|---|---|
+| `HOST_ID` | no | Host identifier sent in payload (fallback: `HOSTNAME`) |
+| `INGEST_URL` | no | HTTP endpoint for metric ingest. If empty => dry-run |
+| `AGENT_TOKEN` | no | Bearer token for ingest API |
+| `DRY_RUN` | no | Force dry-run mode (`1` to enable) |
+
+---
+
+### Run
+
+```bash
+vps-metric-agent
+```
+
+Or from source:
+
+```bash
+bun run src/index.ts
+```
+
+---
+
+### Current Metrics / Plugins
+
+- `cpu.plugin.ts` → `cpu_used_pct`
+- `memory.plugin.ts` → `mem_total_kb`, `mem_available_kb`, `mem_used_kb`, `mem_used_pct`
+- `load.plugin.ts` → `load1`, `load5`, `load15`
+- `io.plugin.ts` → `net_rx_bytes_total`, `net_tx_bytes_total`, `net_rx_bytes_per_sec`, `net_tx_bytes_per_sec`
+- `storage.plugin.ts` → root storage usage (`storage_root_*`)
+- `uptime.plugin.ts` → `uptime_sec`
+- `process.plugin.ts` → `process_count`
+
+Payload format per plugin:
 
 ```json
 {
@@ -101,26 +85,47 @@ The agent sends JSON payload per plugin:
 }
 ```
 
-## GitHub Actions
+---
 
-This repository includes CI workflow to build binaries for:
+## 2) Contributing (for developers)
 
-- linux-x64
-- linux-arm64
-- darwin-arm64
-- windows-x64
+### Local Development
 
-Artifacts are uploaded from each workflow run.
+```bash
+bun run src/index.ts
+```
 
-## Release & Quality Gates
+### Tests
 
-- Versioning/changelog managed via **Release Please** (`release-please.yml`)
-  - Requires repository secret `RELEASE_PLEASE_TOKEN` (classic PAT with `repo` scope)
-  - If secret is absent, workflow auto-skip with info message (non-failing)
-- Branch protection on `main` requires passing `test` check before merge
+```bash
+# run all tests
+bun test
 
-## Notes
+# CI style (stop at first failure)
+bun run test:ci
+```
 
-- Ingest API implementation intentionally deferred for next phase.
-- Plugin layout now split by concern for readability and easier extension.
-- Golden `/proc` fixtures are stored in `test/fixtures/proc/`.
+Test scope:
+- parser correctness per plugin
+- malformed input fallback (no crash)
+- plugin registry sanity
+- collect() integration with mocked runtime
+- golden `/proc` fixtures regression (`test/fixtures/proc/`)
+
+### Build Binary
+
+```bash
+bun run build:linux-x64
+bun run build:linux-arm64
+bun run build:darwin-arm64
+bun run build:windows-x64
+```
+
+Output binaries are in `dist/`.
+
+### CI / Release Notes
+
+- GitHub Actions builds binaries for linux-x64, linux-arm64, darwin-arm64, windows-x64
+- Release automation uses Release Please workflow
+- If `RELEASE_PLEASE_TOKEN` is not configured, release workflow is skipped (non-failing)
+- Branch protection on `main` requires passing `test` check
