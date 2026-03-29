@@ -6,7 +6,8 @@ Lightweight VPS metric agent built with Bun and plugin architecture.
 
 - ⚡ Lightweight binary agent (Bun-compiled)
 - 🧩 Plugin-based metrics (1 plugin = 1 concern)
-- 📤 Push model to your ingest API endpoint
+- 📤 Push mode to your ingest API endpoint
+- 🔔 Standalone notify mode (Telegram / Discord)
 - 🧪 Strong test baseline (unit + integration + golden fixtures)
 - 🏗️ CI builds multi-platform binaries (Linux/macOS/Windows)
 
@@ -32,9 +33,6 @@ curl -fsSL https://raw.githubusercontent.com/pfnapp/vps-metric-agent/main/instal
 curl -fsSL https://raw.githubusercontent.com/pfnapp/vps-metric-agent/main/install.sh | bash -s -- --user --force
 ```
 
-Default behavior is safe: if binary already exists, installer stops with error.
-Use `--force` only when you intentionally want to replace it.
-
 Raw script URL:
 `https://raw.githubusercontent.com/pfnapp/vps-metric-agent/main/install.sh`
 
@@ -44,34 +42,74 @@ Raw script URL:
 
 ---
 
-### Configure
+## 2) Configuration
 
-Environment variables:
+### Config sources & precedence
 
-| Variable | Required | Description |
-|---|---|---|
-| `HOST_ID` | no | Host identifier sent in payload (fallback: `HOSTNAME`) |
-| `INGEST_URL` | no | HTTP endpoint for metric ingest. If empty => dry-run |
-| `AGENT_TOKEN` | no | Bearer token for ingest API |
-| `DRY_RUN` | no | Force dry-run mode (`1` to enable) |
+Lowest to highest priority:
+
+1. Built-in defaults
+2. `/etc/vps-metric-agent/config.yaml`
+3. `~/.config/vps-metric-agent/config.yaml`
+4. `--config /path/to/config.yaml`
+5. Environment variable overrides
+
+### Config file example
+
+See full sample: `config/config.example.yaml`
+
+### Main modes
+
+- `push` → send metrics to ingest endpoint
+- `notify` → only send alert notifications (standalone, no ingest)
+- `hybrid` → both push + notify
+
+### Env vars (common)
+
+| Variable | Description |
+|---|---|
+| `HOST_ID` | Override host identifier |
+| `INGEST_URL` | Override ingest URL |
+| `AGENT_TOKEN` | Bearer token used by ingest output |
+| `DRY_RUN=1` | Disable ingest output |
+| `AGENT_MODE` | Override mode (`push`/`notify`/`hybrid`) |
+| `STATE_FILE` | Custom alert state file path |
+| `ALERT_COOLDOWN_SEC` | Override cooldown |
+| `ALERT_SEND_RECOVERY` | Override recovery send (`true/false`) |
+| `TG_BOT_TOKEN` | Telegram bot token |
+| `TG_CHAT_ID` | Telegram chat target |
+| `DISCORD_WEBHOOK_URL` | Discord webhook target |
 
 ---
 
-### Run
+## 3) Run
 
 ```bash
 vps-metric-agent
 ```
 
-Or from source:
+From source:
 
 ```bash
 bun run src/index.ts
 ```
 
+Useful flags:
+
+```bash
+# print merged config and exit
+vps-metric-agent --print-effective-config
+
+# load explicit config file
+vps-metric-agent --config /etc/vps-metric-agent/config.yaml
+
+# send one test notification and exit
+vps-metric-agent --test-notify
+```
+
 ---
 
-### Current Metrics / Plugins
+## 4) Current Metrics / Plugins
 
 - `cpu.plugin.ts` → `cpu_used_pct`
 - `memory.plugin.ts` → `mem_total_kb`, `mem_available_kb`, `mem_used_kb`, `mem_used_pct`
@@ -81,7 +119,7 @@ bun run src/index.ts
 - `uptime.plugin.ts` → `uptime_sec`
 - `process.plugin.ts` → `process_count`
 
-Payload format per plugin:
+Push payload format per plugin:
 
 ```json
 {
@@ -96,7 +134,7 @@ Payload format per plugin:
 
 ---
 
-## 2) Contributing (for developers)
+## 5) Contributing (for developers)
 
 ### Local Development
 
@@ -119,6 +157,9 @@ Test scope:
 - malformed input fallback (no crash)
 - plugin registry sanity
 - collect() integration with mocked runtime
+- config loader & env overrides
+- alert evaluation (`for_sec`, cooldown, recovery)
+- notifier fanout behavior
 - golden `/proc` fixtures regression (`test/fixtures/proc/`)
 
 ### Build Binary
