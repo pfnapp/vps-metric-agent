@@ -1,0 +1,43 @@
+agent:
+  mode: notify # push | notify | hybrid
+  host_id: auto
+  # state_file: /var/lib/vps-metric-agent/state.json
+
+collect:
+  # optional global interval override for all plugins
+  # interval_sec: 15
+
+alerts:
+  cooldown_sec: 300
+  send_recovery: true
+  rules:
+    - id: cpu-high
+      metric: cpu_used_pct
+      op: ">"
+      threshold: 75
+      for_sec: 60
+      severity: warn
+      message: "CPU high: {{value}}% (>{{threshold}}%)"
+
+    - id: mem-high
+      metric: mem_used_pct
+      op: ">"
+      threshold: 85
+      for_sec: 120
+      severity: critical
+      message: "Memory high: {{value}}% (>{{threshold}}%)"
+
+outputs:
+  ingest:
+    enabled: false
+    url: ""
+    token_env: AGENT_TOKEN
+
+  telegram:
+    enabled: true
+    bot_token_env: TG_BOT_TOKEN
+    chat_id: ""
+
+  discord:
+    enabled: false
+    webhook_url_env: DISCORD_WEBHOOK_URL
